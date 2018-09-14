@@ -1,32 +1,58 @@
 package org.casadocodigo.loja.controllers;
 
+import java.util.List;
+import javax.validation.Valid;
 import org.casadocodigo.loja.daos.ProdutoDAO;
 import org.casadocodigo.loja.models.Produto;
+import org.casadocodigo.loja.models.TipoPreco;
+import org.casadocodigo.loja.validation.ProdutoValidation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-@Controller
-public class ProdutosController {
+	@Controller
+	@RequestMapping("produtos")
+	public class ProdutosController {
+
+	@Autowired
+	private ProdutoDAO produtoDao;
 	
-	 @RequestMapping("/produtos/form")
-	    public String form(){
-	        System.out.println("Entrando na home da CDC");
-			return "produtos/form";
-	    }
-	 
-	 @Autowired
-	    private ProdutoDAO produtoDao;
+	@InitBinder
+	public void initBinder(WebDataBinder binder) {
+		binder.addValidators(new ProdutoValidation());
+	}
+	
+	@RequestMapping("/form")
+	public ModelAndView form() {
+		System.out.println("Entrando na home da CDC");
+		ModelAndView modelAndView = new ModelAndView("produtos/form");
+		modelAndView.addObject("tipos", TipoPreco.values());
+		return modelAndView;
+	}
 
-	    @RequestMapping("/produtos")
-	    public String gravar(Produto produto){
-	        System.out.println(produto);
-	        produtoDao.gravar(produto);
-	        return "/produtos/ok";
+	@RequestMapping(method = RequestMethod.POST)
+	public ModelAndView gravar(@Valid Produto produto, BindingResult result, RedirectAttributes redirectAttributes) {
+		if (result.hasErrors()) {
+			return form();
+		}
+		System.out.println(produto);
 		
-		 
-		
-		 
-	 }
+		produtoDao.gravar(produto);
+		redirectAttributes.addFlashAttribute("sucesso", "Produto cadastrado com sucesso !");
+		return new ModelAndView("redirect:produtos"); 
+	}
 
+	@RequestMapping(method = RequestMethod.GET)
+	public ModelAndView listar() {
+		List<Produto> produtos = produtoDao.listar();
+		ModelAndView modelAndView = new ModelAndView("produtos/lista");
+		modelAndView.addObject("produtos", produtos);
+		return modelAndView;
+	}
 }

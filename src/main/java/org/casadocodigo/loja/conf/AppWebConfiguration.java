@@ -8,15 +8,15 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
 @EnableWebMvc
-@ComponentScan(basePackageClasses={HomeController.class, ProdutoDAO.class})
+@ComponentScan(basePackageClasses = { HomeController.class, ProdutoDAO.class })
 public class AppWebConfiguration {
-	
+
 	@Bean
-	public InternalResourceViewResolver internalResourceViewResolver(){
-	    InternalResourceViewResolver resolver = new InternalResourceViewResolver();
-	    resolver.setPrefix("/WEB-INF/views/");
-	    resolver.setSuffix(".jsp");
-	    return resolver;
+	public InternalResourceViewResolver internalResourceViewResolver() {
+		InternalResourceViewResolver resolver = new InternalResourceViewResolver();
+		resolver.setPrefix("/WEB-INF/views/");
+		resolver.setSuffix(".jsp");
+		return resolver;
 	}
 
 }
